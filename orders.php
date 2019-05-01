@@ -9,14 +9,29 @@
 require_once __DIR__ . '/OrderDB.php';
 
 class orders {
-    public static function generate(OrderDB $db) {
+    public static function export(OrderDB $db) {
         $files = $db->getFiles();
         foreach ($files as $filename) {
             $content = file_get_contents($filename);
             if ($content !== FALSE) {
                 echo $content;
-                echo PHP_EOL;
             }
+        }
+    }
+    
+    public static function list(OrderDB $db) {
+        $stmt = $db->getRows();
+        $email = NULL;
+        $date = NULL;
+        $filename = NULL;
+        $status = -1;
+        $stmt->bindColumn('email', $email, PDO::PARAM_STR);
+        $stmt->bindColumn('time', $date, PDO::PARAM_STR);
+        $stmt->bindColumn('filename', $filename, PDO::PARAM_STR);
+        $stmt->bindColumn('status', $status, PDO::PARAM_INT);
+        
+        while ($stmt->fetch(PDO::FETCH_BOUND)) {
+            echo "$date\t$filename\t$email\n";
         }
     }
     

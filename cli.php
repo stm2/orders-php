@@ -14,6 +14,14 @@ class cli {
         orders::insert($db, $time, $filename, $email);
     }
     
+    public static function list(OrderDB $db) {
+        orders::list($db);
+    }
+    
+    public static function export(OrderDB $db) {
+        orders::export($db);
+    }
+    
     public static function connect(string $dbsource) {
         $db = new OrderDB();
         $db->connect($dbsource);
@@ -21,7 +29,70 @@ class cli {
     }
 }
 
-$db = cli::connect('sqlite:orders.db');
-cli::insert($db, 'orders-enno.txt', '2005-08-15T15:52:02+00:00');
-cli::insert($db, 'orders-wiki.txt', '2005-08-15T15:52:01+00:00');
-var_dump($db->getFiles());
+function usage($name) {
+    return "Usage: $name [-d <database>] <command> [<args>] \n" . <<<USAGE
+These commands are available:
+            help    display help information
+            list    show all files received
+            insert  insert a new file
+            export  export all files in order
+USAGE;
+}
+
+// Script example.php
+$dbname = 'orders.db';
+$optind = null;
+$opts = getopt('d::h', [], $optind);
+
+if (isset($opts['h'])) {
+    echo usage($argv[0]);
+    exit(0);
+}
+
+$pos_args = array_slice($argv, $optind);
+
+if (!isset($pos_args[0])) {
+    echo usage($argv[0]);
+    exit(1);
+}
+
+$command = $pos_args[0];
+
+if ($command == 'help') {
+    echo usage($argv[0]);
+    exit(0);
+}
+
+if (isset($opts['d'])) {
+    $dbname = $opts['d'];
+}
+$db = cli::connect('sqlite:' . $dbname);
+
+if ('insert' == $command) {
+    if (isset($pos_args[1])) {
+        $filename = $pos_args[1];
+    }
+    else {
+        echo usage($argv[0]);
+        exit(1);
+    }
+    if (isset($pos_args[2])) {
+        $time = $pos_args[2];
+    }
+    else {
+        $time = 'now';
+    }
+    if (isset($pos_args[3])) {
+        $email = $pos_args[3];
+    }
+    else {
+        $email = null;
+    }
+    cli::insert($db, $filename, $time, $email);
+}
+elseif ('list' == $command) {
+    cli::list($db);
+}
+elseif ('export' == $command) {
+    cli::export($db);
+}
