@@ -39,6 +39,7 @@ These commands are available:
 USAGE;
 }
 
+
 // Script example.php
 $dbname = 'orders.db';
 $optind = null;
