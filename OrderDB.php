@@ -30,7 +30,6 @@ class OrderDB {
     public function addFile(DateTimeInterface $time, string $filename, string $email = NULL): int {
         $datetime = date_format($time, DateTimeInterface::ATOM);
         $stmt = $this->pdo->prepare("INSERT INTO `submission` (`filename`, `time`, `email`) VALUES (?, ?, ?)");
-        var_dump($stmt);
         if ($stmt->execute([$filename, $datetime, $email]) !== TRUE) {
             return FALSE;
         }
