@@ -42,12 +42,24 @@ USAGE;
 
 // Script example.php
 $dbname = 'orders.db';
-$optind = null;
-$opts = getopt('d::h', [], $optind);
 
-if (isset($opts['h'])) {
-    echo usage($argv[0]);
-    exit(0);
+$optind = 1;
+while (isset($argv[$optind])) {
+    $arg = $argv[$optind];
+    if (in_array($arg, ['-h', '--help'])) {
+        echo usage($argv[0]);
+        exit(0);
+    }
+    elseif ('-d' === $arg) {
+        $dbname = argv[++$optind];
+    }
+    elseif ('--dbname=' === substr($arg, 0, 9)) {
+        $dbname = substr(arg, 9);
+    }
+    else {
+        break;
+    }
+    ++$optind;
 }
 
 $pos_args = array_slice($argv, $optind);
