@@ -78,16 +78,22 @@ if ('insert' == $command) {
         exit(1);
     }
     if (isset($pos_args[2])) {
-        $time = $pos_args[2];
-    }
-    else {
-        $time = 'now';
-    }
-    if (isset($pos_args[3])) {
-        $email = $pos_args[3];
+        $email = $pos_args[2];
     }
     else {
         $email = null;
+    }
+    if (isset($pos_args[3])) {
+        $time = $pos_args[3];
+    }
+    else {
+        $mtime = filemtime($filename);
+        if (FALSE === $mtime) {
+            $time = 'now';
+        }
+        else {
+            $time = date(DATE_ATOM, $mtime);
+        }
     }
     cli::insert($db, $filename, $time, $email);
 }
