@@ -20,7 +20,7 @@ class OrderDB {
         $this->pdo = new PDO($dbsource);
         $this->stmtInsert = NULL;
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $schema = file_get_contents('schema/sqlite.sql');
+        $schema = file_get_contents(__DIR__ . '/schema/sqlite.sql');
         $this->pdo->exec($schema);
     }
     
