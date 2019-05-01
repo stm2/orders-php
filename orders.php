@@ -31,11 +31,16 @@ class orders {
         $stmt->bindColumn('status', $status, PDO::PARAM_INT);
         
         while ($stmt->fetch(PDO::FETCH_BOUND)) {
-            echo "$date\t$filename\t$email\n";
+            echo "$status\t$date\t$filename\t$email\n";
         }
     }
     
     public static function insert(OrderDB $db, DateTimeInterface $time, string $filename, string $email = NULL) {
         return $db->addFile($time, $filename, $email);
     }
+    
+    public static function set_status(OrderDB $db, string $filename, int $status) {
+        $db->setStatus($filename, $status);
+    }
+
 }

@@ -14,13 +14,13 @@
 class OrderDB {
     /** @var PDO $pdo */
     private $pdo;
-    private $stmtInsert;
+    private $stmtInsert = NULL;
+    private $stmtUpdate = NULL;
 
     public function connect(string $dbsource) {
         $this->pdo = new PDO($dbsource);
-        $this->stmtInsert = NULL;
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $schema = file_get_contents('schema/sqlite.sql');
+        $schema = file_get_contents(__DIR__ . '/schema/sqlite.sql');
         $this->pdo->exec($schema);
     }
     
@@ -33,6 +33,13 @@ class OrderDB {
         return $this->pdo->query("SELECT `time`, `status`, `email`, `filename` FROM `submission` ORDER BY `time` ASC");
     }
 
+    public function setStatus(string $filename, int $status) {
+        if (is_null($this->stmtUpdate)) {
+            $this->stmtUpdate = $this->pdo->prepare("UPDATE `submission` SET `status` = ? WHERE `filename` = ?");
+        }
+        return $this->stmtUpdate->execute([$status, $filename]);
+    }
+    
     public function addFile(DateTimeInterface $time, string $filename, string $email = NULL): int {
         $datetime = date('Y-m-d H:i:s', $time->format('U'));
         if (is_null($this->stmtInsert)) {

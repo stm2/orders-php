@@ -14,6 +14,10 @@ class cli {
         orders::insert($db, $time, $filename, $email);
     }
     
+    public static function update(OrderDB $db, string $filename, int $status) {
+        orders::set_status($db, $filename, $status);
+    }
+    
     public static function list(OrderDB $db) {
         orders::list($db);
     }
@@ -29,7 +33,7 @@ class cli {
     }
 }
 
-function usage($name) {
+function usage($name, $command = NULL) {
     return "Usage: $name [-d <database>] <command> [<args>] \n" . <<<USAGE
 These commands are available:
             help    display help information
@@ -86,7 +90,7 @@ if ('insert' == $command) {
         $filename = $pos_args[1];
     }
     else {
-        echo usage($argv[0]);
+        echo usage($argv[0], $command);
         exit(1);
     }
     if (isset($pos_args[2])) {
@@ -111,6 +115,21 @@ if ('insert' == $command) {
 }
 elseif ('list' == $command) {
     cli::list($db);
+}
+elseif('update' == $command) {
+    if (isset($pos_args[1])) {
+        $filename = $pos_args[1];
+    }
+    if (isset($pos_args[2])) {
+        $status = intval($pos_args[2]);
+    }
+    if (isset($status) and isset($filename)) {
+        cli::update($db, $filename, $status);
+    }
+    else {
+        echo usage($argv[0], $command);
+        exit(1);
+    }
 }
 elseif ('export' == $command) {
     cli::export($db);
