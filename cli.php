@@ -55,10 +55,10 @@ while (isset($argv[$optind])) {
         exit(0);
     }
     elseif ('-d' === $arg) {
-        $dbname = argv[++$optind];
+        $dbname = $argv[++$optind];
     }
     elseif ('--dbname=' === substr($arg, 0, 9)) {
-        $dbname = substr(arg, 9);
+        $dbname = substr($arg, 9);
     }
     else {
         break;
