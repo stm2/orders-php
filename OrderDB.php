@@ -41,7 +41,7 @@ class OrderDB {
     }
     
     public function addFile(DateTimeInterface $time, string $filename, string $email = NULL): int {
-        $datetime = date('Y-m-d H:i:s', $time->format('U'));
+        $datetime = gmdate('Y-m-d H:i:s', $time->format('U'));
         if (is_null($this->stmtInsert)) {
             $this->stmtInsert = $this->pdo->prepare("INSERT INTO `submission` (`filename`, `time`, `email`) VALUES (?, ?, ?)");
         }

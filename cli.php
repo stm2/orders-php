@@ -9,8 +9,7 @@
 require_once __DIR__ . '/orders.php';
 
 class cli {
-    public static function insert(OrderDB $db, string $filename, string $timestamp = 'now', string $email = NULL) {
-        $time = new DateTime($timestamp);
+    public static function insert(OrderDB $db, string $filename, DateTimeInterface $time, string $email = NULL) {
         orders::insert($db, $time, $filename, $email);
     }
     
@@ -100,15 +99,15 @@ if ('insert' == $command) {
         $email = null;
     }
     if (isset($pos_args[3])) {
-        $time = $pos_args[3];
+        $time = new DateTime($pos_args[3]);
     }
     else {
         $mtime = filemtime($filename);
         if (FALSE === $mtime) {
-            $time = 'now';
+            $time = new DateTime('now');
         }
         else {
-            $time = date(DATE_ATOM, $mtime);
+            $time = DateTime::createFromFormat('U', $mtime);
         }
     }
     cli::insert($db, $filename, $time, $email);
