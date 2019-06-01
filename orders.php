@@ -43,4 +43,8 @@ class orders {
         $db->setStatus($filename, $status);
     }
 
+    public static function get_next(OrderDB $db) {
+        $row = $db->getNext();
+        return $row['filename'];
+    }
 }

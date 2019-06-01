@@ -15,7 +15,7 @@ class OrderDB {
     /** @var PDO $pdo */
     private $pdo;
     private $stmtInsert = NULL;
-    private $stmtUpdate = NULL;
+    private $stmtUpdateFile = NULL;
 
     public function connect(string $dbsource) {
         $this->pdo = new PDO($dbsource);
@@ -34,10 +34,19 @@ class OrderDB {
     }
 
     public function setStatus(string $filename, int $status) {
-        if (is_null($this->stmtUpdate)) {
-            $this->stmtUpdate = $this->pdo->prepare("UPDATE `submission` SET `status` = ? WHERE `filename` = ?");
+        if (is_null($this->stmtUpdateFile)) {
+            $this->stmtUpdateFile = $this->pdo->prepare("UPDATE `submission` SET `status` = ? WHERE `filename` = ?");
         }
-        return $this->stmtUpdate->execute([$status, $filename]);
+        return $this->stmtUpdateFile->execute([$status, $filename]);
+    }
+    
+    public function getNext() {
+        $this->pdo->beginTransaction();
+        $stmt = $this->pdo->query("SELECT `id`, `filename` FROM `submission` WHERE `status` = 0 ORDER BY `time` LIMIT 1");
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->setStatus($row['filename'], 1);
+        $this->pdo->commit();
+        return $row;
     }
     
     public function addFile(DateTimeInterface $time, string $filename, string $email = NULL): int {

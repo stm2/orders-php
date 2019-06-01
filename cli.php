@@ -17,6 +17,11 @@ class cli {
         orders::set_status($db, $filename, $status);
     }
     
+    public static function lock(OrderDB $db) {
+        $filename = orders::get_next($db);
+        echo $filename . PHP_EOL;
+    }
+    
     public static function list(OrderDB $db) {
         orders::list($db);
     }
@@ -37,13 +42,13 @@ function usage($name, $command = NULL) {
 These commands are available:
             help    display help information
             list    show all files received
+            lock    fetch a filename for processing
+            update  set file status
             insert  insert a new file
             export  export all files in order
 USAGE;
 }
 
-
-// Script example.php
 $dbname = 'orders.db';
 
 $optind = 1;
@@ -111,6 +116,9 @@ if ('insert' == $command) {
         }
     }
     cli::insert($db, $filename, $time, $email);
+}
+elseif ('lock' == $command) {
+    cli::lock($db);
 }
 elseif ('list' == $command) {
     cli::list($db);
