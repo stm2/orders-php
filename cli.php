@@ -67,8 +67,9 @@ These commands are available:
             select  fetch a filename for processing
             update  set file status
             insert  insert a new file
-            export  export all files in order
             info    analyze order file, print factions/passwords
+	    export  export all files in order
+
 USAGE;
 }
 
