@@ -73,12 +73,12 @@ class OrderDB {
         return $row;
     }
     
-    public function addFile(DateTimeInterface $time, string $filename, string $email = NULL): int {
+    public function addFile(DateTimeInterface $time, string $filename, string $lang, string $email = NULL): int {
         $datetime = gmdate('Y-m-d H:i:s', $time->format('U'));
         if (is_null($this->stmtInsert)) {
-            $this->stmtInsert = $this->pdo->prepare("INSERT INTO `submission` (`filename`, `time`, `email`) VALUES (?, ?, ?)");
+            $this->stmtInsert = $this->pdo->prepare("INSERT INTO `submission` (`filename`, `time`, `language`, `email`) VALUES (?, ?, ?, ?)");
         }
-        if ($this->stmtInsert->execute([$filename, $datetime, $email]) !== TRUE) {
+        if ($this->stmtInsert->execute([$filename, $datetime, $lang, $email]) !== TRUE) {
             return FALSE;
         }
         return $this->pdo->lastInsertId();

@@ -9,8 +9,8 @@
 require_once __DIR__ . '/orders.php';
 
 class cli {
-    public static function insert(OrderDB $db, string $filename, DateTimeInterface $time, string $email = NULL) {
-        orders::insert($db, $time, $filename, $email);
+    public static function insert(OrderDB $db, string $filename, DateTimeInterface $time, string $lang, string $email = NULL) {
+        orders::insert($db, $time, $filename, $lang, $email);
     }
     
     public static function update(OrderDB $db, string $filename, int $status) {
@@ -92,21 +92,22 @@ if (isset($opts['d'])) {
 $db = cli::connect('sqlite:' . $dbname);
 
 if ('insert' == $command) {
-    if (isset($pos_args[1])) {
+    if (isset($pos_args[2])) {
         $filename = $pos_args[1];
+        $lang = $pos_args[2];
     }
     else {
         echo usage($argv[0], $command);
         exit(1);
     }
-    if (isset($pos_args[2])) {
-        $email = $pos_args[2];
+    if (isset($pos_args[3])) {
+        $email = $pos_args[3];
     }
     else {
         $email = null;
     }
-    if (isset($pos_args[3])) {
-        $time = new DateTime($pos_args[3]);
+    if (isset($pos_args[4])) {
+        $time = new DateTime($pos_args[4]);
     }
     else {
         $mtime = filemtime($filename);
@@ -117,7 +118,7 @@ if ('insert' == $command) {
             $time = DateTime::createFromFormat('U', $mtime);
         }
     }
-    cli::insert($db, $filename, $time, $email);
+    cli::insert($db, $filename, $time, $lang, $email);
 }
 elseif ('lock' == $command) {
     cli::lock($db);

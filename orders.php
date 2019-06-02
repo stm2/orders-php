@@ -35,8 +35,8 @@ class orders {
         }
     }
     
-    public static function insert(OrderDB $db, DateTimeInterface $time, string $filename, string $email = NULL) {
-        return $db->addFile($time, $filename, $email);
+    public static function insert(OrderDB $db, DateTimeInterface $time, string $filename, string $lang, string $email = NULL) {
+        return $db->addFile($time, $filename, $lang, $email);
     }
     
     public static function set_status(OrderDB $db, string $filename, int $status) {
