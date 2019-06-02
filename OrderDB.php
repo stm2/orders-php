@@ -22,21 +22,22 @@ class OrderDB {
         $stmt = $this->pdo->query("PRAGMA user_version");
         $column = $stmt->fetch(PDO::FETCH_COLUMN);
         $version = $column[0];
-        if ($version < self::SCHEMA_VERSION) {
-            if ($version == 0) {
-                $schema = file_get_contents(__DIR__ . '/schema/sqlite.sql');
-                $this->pdo->exec($schema);
-            }
-            else {
-                for ($v = $version; $v != self::SCHEMA_VERSION; $v++) {
-                    $filename = __DIR__ . '/schema/sqlite-' . (1 + $v) . '.sql';
-                    $schema = file_get_contents($filename);
-                    if ($schema == FALSE) {
-                        echo "cannot update schema from version $version to " . self::SCHEMA_VERSION . PHP_EOL;
-                        break;
-                    }
-                    $this->pdo->exec($schema);
+        if ($version >= self::SCHEMA_VERSION) {
+            return;
+        }
+        if ($version == 0) {
+            $schema = file_get_contents(__DIR__ . '/schema/sqlite.sql');
+            $this->pdo->exec($schema);
+        }
+        else {
+            for ($v = $version; $v != self::SCHEMA_VERSION; $v++) {
+                $filename = __DIR__ . '/schema/sqlite-' . (1 + $v) . '.sql';
+                $schema = file_get_contents($filename);
+                if ($schema == FALSE) {
+                    echo "cannot update schema from version $version to " . self::SCHEMA_VERSION . PHP_EOL;
+                    break;
                 }
+                $this->pdo->exec($schema);
             }
         }
     }
