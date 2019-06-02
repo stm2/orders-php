@@ -8,7 +8,7 @@
  * Created: May 1, 2019
  */
 
-PRAGMA user_version = 2;
+PRAGMA user_version = 1;
 
 CREATE TABLE IF NOT EXISTS `submission`
 (
@@ -16,6 +16,5 @@ CREATE TABLE IF NOT EXISTS `submission`
     `status` INTEGER NOT NULL DEFAULT 0,
     `time` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `filename` VARCHAR(128) NOT NULL,
-    `email` VARCHAR(128),
-    `language` VARCHAR(5)
+    `email` VARCHAR(128)
 );

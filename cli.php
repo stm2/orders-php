@@ -18,8 +18,10 @@ class cli {
     }
     
     public static function lock(OrderDB $db) {
-        $filename = orders::get_next($db);
-        echo $filename . PHP_EOL;
+        $row = orders::get_next($db);
+        $filename = $row['filename'];
+        $email = $row['email'];
+        echo $email . "\t" . $filename . PHP_EOL;
     }
     
     public static function list(OrderDB $db) {

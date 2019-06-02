@@ -45,6 +45,6 @@ class orders {
 
     public static function get_next(OrderDB $db) {
         $row = $db->getNext();
-        return $row['filename'];
+        return $row;
     }
 }

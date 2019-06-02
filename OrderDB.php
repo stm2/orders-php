@@ -12,16 +12,39 @@
  * @author Enno
  */
 class OrderDB {
+    const SCHEMA_VERSION = 2;
     /** @var PDO $pdo */
     private $pdo;
     private $stmtInsert = NULL;
     private $stmtUpdateFile = NULL;
 
+    private function update() {
+        $stmt = $this->pdo->query("PRAGMA user_version");
+        $column = $stmt->fetch(PDO::FETCH_COLUMN);
+        $version = $column[0];
+        if ($version < self::SCHEMA_VERSION) {
+            if ($version == 0) {
+                $schema = file_get_contents(__DIR__ . '/schema/sqlite.sql');
+                $this->pdo->exec($schema);
+            }
+            else {
+                for ($v = $version; $v != self::SCHEMA_VERSION; $v++) {
+                    $filename = __DIR__ . '/schema/sqlite-' . (1 + $v) . '.sql';
+                    $schema = file_get_contents($filename);
+                    if ($schema == FALSE) {
+                        echo "cannot update schema from version $version to " . self::SCHEMA_VERSION . PHP_EOL;
+                        break;
+                    }
+                    $this->pdo->exec($schema);
+                }
+            }
+        }
+    }
+    
     public function connect(string $dbsource) {
         $this->pdo = new PDO($dbsource);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $schema = file_get_contents(__DIR__ . '/schema/sqlite.sql');
-        $this->pdo->exec($schema);
+        $this->update();
     }
     
     public function getFiles() {
@@ -42,7 +65,7 @@ class OrderDB {
     
     public function getNext() {
         $this->pdo->beginTransaction();
-        $stmt = $this->pdo->query("SELECT `id`, `filename` FROM `submission` WHERE `status` = 0 ORDER BY `time` LIMIT 1");
+        $stmt = $this->pdo->query("SELECT `filename`, `email` FROM `submission` WHERE `status` = 0 ORDER BY `time` LIMIT 1");
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $stmt = $this->setStatus($row['filename'], 1);
         $this->pdo->commit();
