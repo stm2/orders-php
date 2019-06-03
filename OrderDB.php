@@ -64,9 +64,9 @@ class OrderDB {
         return $this->stmtUpdateFile->execute([$status, $filename]);
     }
     
-    public function getNext() {
+    public function selectRow() {
         $this->pdo->beginTransaction();
-        $stmt = $this->pdo->query("SELECT `filename`, `email` FROM `submission` WHERE `status` = 0 ORDER BY `time` LIMIT 1");
+        $stmt = $this->pdo->query("SELECT `language`, `filename`, `email` FROM `submission` WHERE `status` = 0 ORDER BY `time` LIMIT 1");
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $stmt = $this->setStatus($row['filename'], 1);
         $this->pdo->commit();

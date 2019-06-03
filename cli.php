@@ -7,6 +7,9 @@
  */
 
 require_once __DIR__ . '/orders.php';
+require_once __DIR__ . '/parser.php';
+
+define('REGEXP_FACTION', '/\s*(PARTEI|ERESSEA|FACTION)\s+(\w+)\s"(\w+)"/i');
 
 class cli {
     public static function insert(OrderDB $db, string $filename, DateTimeInterface $time, string $lang, string $email = NULL) {
@@ -17,11 +20,12 @@ class cli {
         orders::set_status($db, $filename, $status);
     }
     
-    public static function lock(OrderDB $db) {
-        $row = orders::get_next($db);
+    public static function select(OrderDB $db) {
+        $row = orders::select($db);
         $filename = $row['filename'];
         $email = $row['email'];
-        echo $email . "\t" . $filename . PHP_EOL;
+        $lang = $row['language'];
+        echo $lang . "\t" . $email . "\t" . $filename . PHP_EOL;
     }
     
     public static function list(OrderDB $db) {
@@ -37,6 +41,20 @@ class cli {
         $db->connect($dbsource);
         return $db;
     }
+
+    public static function info(string $filename) {
+        $f = fopen($filename, 'r');
+        if (NULL !== $f) {
+            parser::parse($f, function ($order) {
+                $matches = NULL;
+                if (1 === preg_match(REGEXP_FACTION, $order, $matches)) {
+                    $faction = $matches[2];
+                    $password = $matches[3];
+                    echo $faction . "\t" . $password . PHP_EOL;
+                }
+            });
+        }
+    }
 }
 
 function usage($name, $command = NULL) {
@@ -44,14 +62,13 @@ function usage($name, $command = NULL) {
 These commands are available:
             help    display help information
             list    show all files received
-            lock    fetch a filename for processing
+            select  fetch a filename for processing
             update  set file status
             insert  insert a new file
             export  export all files in order
+            info    analyze order file, print factions/passwords
 USAGE;
 }
-
-$dbname = 'orders.db';
 
 $optind = 1;
 while (isset($argv[$optind])) {
@@ -83,64 +100,75 @@ $command = $pos_args[0];
 
 if ($command == 'help') {
     echo usage($argv[0]);
-    exit(0);
 }
-
-if (isset($opts['d'])) {
-    $dbname = $opts['d'];
-}
-$db = cli::connect('sqlite:' . $dbname);
-
-if ('insert' == $command) {
-    if (isset($pos_args[2])) {
-        $filename = $pos_args[1];
-        $lang = $pos_args[2];
-    }
-    else {
-        echo usage($argv[0], $command);
-        exit(1);
-    }
-    if (isset($pos_args[3])) {
-        $email = $pos_args[3];
-    }
-    else {
-        $email = null;
-    }
-    if (isset($pos_args[4])) {
-        $time = new DateTime($pos_args[4]);
-    }
-    else {
-        $mtime = filemtime($filename);
-        if (FALSE === $mtime) {
-            $time = new DateTime('now');
-        }
-        else {
-            $time = DateTime::createFromFormat('U', $mtime);
-        }
-    }
-    cli::insert($db, $filename, $time, $lang, $email);
-}
-elseif ('lock' == $command) {
-    cli::lock($db);
-}
-elseif ('list' == $command) {
-    cli::list($db);
-}
-elseif('update' == $command) {
+elseif ('info' == $command) {
     if (isset($pos_args[1])) {
         $filename = $pos_args[1];
-    }
-    if (isset($pos_args[2])) {
-        $status = intval($pos_args[2]);
-    }
-    if (isset($status) and isset($filename)) {
-        cli::update($db, $filename, $status);
+        $lang = $pos_args[1];
     }
     else {
         echo usage($argv[0], $command);
         exit(1);
     }
+    cli::info($filename);
 }
-elseif ('export' == $command) {
-    cli::export($db);
+else {
+    $dbname = 'orders.db';
+    if (isset($opts['d'])) {
+        $dbname = $opts['d'];
+    }
+    $db = cli::connect('sqlite:' . $dbname);
+    if ('insert' == $command) {
+        if (isset($pos_args[2])) {
+            $filename = $pos_args[1];
+            $lang = $pos_args[2];
+        }
+        else {
+            echo usage($argv[0], $command);
+            exit(1);
+        }
+        if (isset($pos_args[3])) {
+            $email = $pos_args[3];
+        }
+        else {
+            $email = null;
+        }
+        if (isset($pos_args[4])) {
+            $time = new DateTime($pos_args[4]);
+        }
+        else {
+            $mtime = filemtime($filename);
+            if (FALSE === $mtime) {
+                $time = new DateTime('now');
+            }
+            else {
+                $time = DateTime::createFromFormat('U', $mtime);
+            }
+        }
+        cli::insert($db, $filename, $time, $lang, $email);
+    }
+    elseif ('select' == $command) {
+        cli::select($db);
+    }
+    elseif ('list' == $command) {
+        cli::list($db);
+    }
+    elseif('update' == $command) {
+        if (isset($pos_args[1])) {
+            $filename = $pos_args[1];
+        }
+        if (isset($pos_args[2])) {
+            $status = intval($pos_args[2]);
+        }
+        if (isset($status) and isset($filename)) {
+            cli::update($db, $filename, $status);
+        }
+        else {
+            echo usage($argv[0], $command);
+            exit(1);
+        }
+    }
+    elseif ('export' == $command) {
+        cli::export($db);
+    }
 }
