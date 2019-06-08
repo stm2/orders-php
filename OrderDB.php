@@ -48,7 +48,7 @@ class OrderDB {
         $this->update();
     }
     
-    public function getFiles() {
+    public function getFiles() : array {
         $stmt = $this->pdo->query("SELECT `filename` FROM `submission` ORDER BY `time` ASC");
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
@@ -64,11 +64,13 @@ class OrderDB {
         return $this->stmtUpdateFile->execute([$status, $filename]);
     }
     
-    public function selectRow() {
+    public function selectRow() : array {
         $this->pdo->beginTransaction();
         $stmt = $this->pdo->query("SELECT `language`, `filename`, `email` FROM `submission` WHERE `status` = 0 ORDER BY `time` LIMIT 1");
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $stmt = $this->setStatus($row['filename'], 1);
+        if (!empty($row)) {
+            $stmt = $this->setStatus($row['filename'], 1);
+        }
         $this->pdo->commit();
         return $row;
     }

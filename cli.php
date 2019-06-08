@@ -22,10 +22,12 @@ class cli {
     
     public static function select(OrderDB $db) {
         $row = orders::select($db);
-        $filename = $row['filename'];
-        $email = $row['email'];
-        $lang = $row['language'];
-        echo $lang . "\t" . $email . "\t" . $filename . PHP_EOL;
+        if (!empty($row)) {
+            $filename = $row['filename'];
+            $email = $row['email'];
+            $lang = $row['language'];
+            echo $lang . "\t" . $email . "\t" . $filename . PHP_EOL;
+        }
     }
     
     public static function list(OrderDB $db) {
