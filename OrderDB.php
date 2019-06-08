@@ -64,15 +64,17 @@ class OrderDB {
         return $this->stmtUpdateFile->execute([$status, $filename]);
     }
     
-    public function selectRow() : array {
+    public function selectRow() {
         $this->pdo->beginTransaction();
         $stmt = $this->pdo->query("SELECT `language`, `filename`, `email` FROM `submission` WHERE `status` = 0 ORDER BY `time` LIMIT 1");
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!empty($row)) {
             $stmt = $this->setStatus($row['filename'], 1);
+            $this->pdo->commit();
+            return $row;
         }
-        $this->pdo->commit();
-        return $row;
+        $this->pdo->rollback();
+        return FALSE;
     }
     
     public function addFile(DateTimeInterface $time, string $filename, string $lang, string $email = NULL): int {
