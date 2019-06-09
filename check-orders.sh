@@ -1,9 +1,10 @@
 #!/bin/sh
 
 # Debug ouput
-# set -x
+#set -x
 
 GAME="$1"
+WARNINGS=0
 
 if [ -z "$ERESSEA" ] ; then
   ERESSEA="$HOME/eressea"
@@ -12,14 +13,29 @@ ECHECK_HOME="$HOME/echeck"
 PYTHON_HOME="$ERESSEA/server/bin"
 DBTOOL_HOME="$ERESSEA/orders-php"
 GAME_HOME="$ERESSEA/game-$GAME"
+TEXTDOMAIN="orders"
+TEXTDOMAINDIR="$DBTOOL_HOME/locale"
+
+export TEXTDOMAINDIR
+
+GETTEXT() {
+  gettext "$TEXTDOMAIN" "$*"
+}
 
 checkpass() {
   FACTION="$1"
   PASSWORD="$2"
-  if [ -z "$PASSWORD" ] ; then
-    return 1
+  if [ -n "$PASSWORD" ]
+  then
+    if "$PYTHON_HOME/checkpasswd.py" "$GAME_HOME/eressea.db" "$FACTION" "$PASSWORD"
+    then
+      return 0
+    fi
   fi
-  "$PYTHON_HOME/checkpasswd.py" "$GAME_HOME/eressea.db" "$FACTION" "$PASSWORD"
+  # shellcheck disable=SC2059
+  printf "$(GETTEXT 'WARNING: Unknown faction %s or invalid password!')\n" "$FACTION"
+  WARNINGS=1
+  return 1
 }
 
 echeck() {
@@ -35,10 +51,18 @@ orders() {
 OUTPUT=$(mktemp)
 cd "$ERESSEA/game-$GAME/orders.dir" || exit
 orders -d orders.db select | while read -r LANGUAGE EMAIL FILENAME ; do
-  orders info "$FILENAME" | while read -r FACTION PASSWORD ; do
-    checkpass "$FACTION" "$PASSWORD" > "$OUTPUT" 2>&1
-  done
+  export LANGUAGE
+  SUBJECT="$(GETTEXT 'orders received')"
+  mkfifo check.pipe
+  orders info "$FILENAME" > check.pipe &
+  while read -r FACTION PASSWORD ; do
+    checkpass "$FACTION" "$PASSWORD" >> "$OUTPUT" 2>&1
+  done < check.pipe
+  rm -f check.pipe
   echeck "$LANGUAGE" "$FILENAME" >> "$OUTPUT" 2>&1
   orders update "$FILENAME" 2
-  mutt -s "Befehle angekommen" "$EMAIL" < "$OUTPUT"
+  if [ $WARNINGS -gt 0 ] ; then
+    SUBJECT="$(GETTEXT 'orders received (warning)')"
+  fi
+  mutt -s "$SUBJECT" "$EMAIL" < "$OUTPUT"
 done
