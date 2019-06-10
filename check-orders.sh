@@ -64,5 +64,5 @@ orders -d orders.db select | while read -r LANGUAGE EMAIL FILENAME ; do
   if [ $WARNINGS -gt 0 ] ; then
     SUBJECT="$(GETTEXT 'orders received (warning)')"
   fi
-  mutt -s "$SUBJECT" "$EMAIL" < "$OUTPUT"
+  mutt -s "[E$GAME] $SUBJECT" "$EMAIL" < "$OUTPUT"
 done
