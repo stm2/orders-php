@@ -10,4 +10,4 @@ po/de.mo: po/de.po
 
 install: po/de.mo
 	install -d $(PREFIX)/locale/de/LC_MESSAGES
-	install po/de.mo $(PREFIX)/locale/de/LC_MESSAGES
+	install po/de.mo $(PREFIX)/locale/de/LC_MESSAGES/orders.mo

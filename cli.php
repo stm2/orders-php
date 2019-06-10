@@ -73,6 +73,7 @@ These commands are available:
 USAGE;
 }
 
+$dbname = 'orders.db';
 $optind = 1;
 while (isset($argv[$optind])) {
     $arg = $argv[$optind];
@@ -116,10 +117,6 @@ elseif ('info' == $command) {
     cli::info($filename);
 }
 else {
-    $dbname = 'orders.db';
-    if (isset($opts['d'])) {
-        $dbname = $opts['d'];
-    }
     $db = cli::connect('sqlite:' . $dbname);
     if ('insert' == $command) {
         if (isset($pos_args[2])) {
