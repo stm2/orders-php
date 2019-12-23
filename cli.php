@@ -46,7 +46,7 @@ class cli {
 
     public static function info(string $filename) {
         $f = fopen($filename, 'r');
-        if (NULL !== $f) {
+        if ($f) {
             parser::parse($f, function ($order) {
                 $matches = NULL;
                 if (1 === preg_match(REGEXP_FACTION, $order, $matches)) {
@@ -108,7 +108,6 @@ if ($command == 'help') {
 elseif ('info' == $command) {
     if (isset($pos_args[1])) {
         $filename = $pos_args[1];
-        $lang = $pos_args[1];
     }
     else {
         echo usage($argv[0], $command);
@@ -119,7 +118,7 @@ elseif ('info' == $command) {
 else {
     $db = cli::connect('sqlite:' . $dbname);
     if ('insert' == $command) {
-        if (isset($pos_args[2])) {
+        if (!empty($pos_args[1]) and isset($pos_args[2])) {
             $filename = $pos_args[1];
             $lang = $pos_args[2];
         }
