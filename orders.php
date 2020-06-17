@@ -29,7 +29,6 @@ class orders {
         $stmt->bindColumn('time', $date, PDO::PARAM_STR);
         $stmt->bindColumn('filename', $filename, PDO::PARAM_STR);
         $stmt->bindColumn('status', $status, PDO::PARAM_INT);
-
         while ($stmt->fetch(PDO::FETCH_BOUND)) {
             echo "$status\t$date\t$filename\t$email\n";
         }
