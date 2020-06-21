@@ -47,7 +47,7 @@ if (isset($_FILES['input']) && !empty($email)) {
         $db = new OrderDB();
         $db->connect($dbsource);
         if (move_uploaded_file($tmp_name, $filename)) {
-            orders::insert($db, $time, $filename, $lang, $email);
+            orders::insert($db, $time, $filename, $lang, $email, 3);
 	}
         unset($db);
     }
