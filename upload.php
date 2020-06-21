@@ -21,7 +21,7 @@ $config = [
     'dbname' => 'orders.db',
 ];
 
-$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL, FILTER_REQUIRE_SCALAR);
+$email = NULL;
 $game = filter_input(INPUT_POST, 'game', FILTER_VALIDATE_INT, ['options' => ['default' => $config['game'], 'min_range' => 1]]);
 $lang = filter_input(INPUT_POST, 'lang', FILTER_SANITIZE_STRING, ['options' => ['default' => $config['lang'], 'flags' => FILTER_REQUIRE_SCALAR]]);
 $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING, FILTER_REQUIRE_SCALAR);
@@ -40,7 +40,7 @@ if (!file_exists($dbfile)) {
 }
 $dbsource = 'sqlite:' . $dbfile;
 $time = new DateTime();
-if (isset($_FILES['input']) && !empty($email)) {
+if (isset($_FILES['input'])) {
     $tmp_name = $_FILES['input']['tmp_name'];
     $filename = tempnam($upload_dir . '/uploads', 'upload-');
     if ($filename) {
