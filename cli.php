@@ -106,13 +106,11 @@ if ($command == 'help') {
     echo usage($argv[0]);
 }
 elseif ('info' == $command) {
-    if (isset($pos_args[1])) {
-        $filename = $pos_args[1];
-    }
-    else {
+    if (empty($pos_args[1])) {
         echo usage($argv[0], $command);
         exit(1);
     }
+    $filename = $pos_args[1];
     cli::info($filename);
 }
 else {
