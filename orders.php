@@ -11,10 +11,19 @@ require_once __DIR__ . '/OrderDB.php';
 class orders {
     public static function export(OrderDB $db) {
         $files = $db->getFiles();
-        foreach ($files as $filename) {
+        foreach ($files as $row) {
+            $filename = $row['filename'];
             $content = file_get_contents($filename);
             if ($content !== FALSE) {
                 echo $content;
+                $language = $row['language'];
+                switch ($language) {
+                    case 'en':
+                        echo "\nNEXT\n";
+                        break;
+                    default:
+                        echo "\nNAECHSTER\n";
+                }
             }
         }
     }
