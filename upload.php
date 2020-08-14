@@ -5,7 +5,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-$method = $_SERVER['REQUEST_METHOD'];
+$method = getenv('REQUEST_METHOD');
 if ($method != 'POST') {
     header('HTTP/1.0 405 Method Not Allowed');
     exit();
