@@ -49,8 +49,8 @@ class OrderDB {
     }
     
     public function getFiles() : array {
-        $stmt = $this->pdo->query("SELECT `filename` FROM `submission` ORDER BY `time` ASC");
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $stmt = $this->pdo->query("SELECT `filename`, `language' FROM `submission` ORDER BY `time` ASC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getRows() : PDOStatement {
