@@ -19,14 +19,17 @@ $config = [
     'lang' => 'de',
     'uploads' => '/home/eressea/www/eressea/files',
     'dbname' => 'orders.db',
+    'password' => NULL,
+//    'password' => password_hash('eressea'),
 ];
 
 $email = NULL;
 $game = filter_input(INPUT_POST, 'game', FILTER_VALIDATE_INT, ['options' => ['default' => $config['game'], 'min_range' => 1]]);
 $lang = filter_input(INPUT_POST, 'lang', FILTER_SANITIZE_STRING, ['options' => ['default' => $config['lang'], 'flags' => FILTER_REQUIRE_SCALAR]]);
 $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING, FILTER_REQUIRE_SCALAR);
+$pwhash = $config['password'];
 
-if ($password != 'eressea') {
+if (!is_null($pwhash) && !password_verify($password, $pwhash)) {
     echo "Permission denied\n";
     header('HTTP/1.0 403 Permission denied');
     exit();
@@ -55,6 +58,7 @@ if (isset($_FILES['input'])) {
         $db->connect($dbsource);
         if (move_uploaded_file($tmp_name, $filename)) {
             orders::insert($db, $time, $filename, $lang, $email, 3);
+            echo "orders were received as $filename\n";
 	}
         unset($db);
     }
