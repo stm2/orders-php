@@ -9,7 +9,6 @@ WARNINGS=0
 if [ -z "$ERESSEA" ] ; then
   ERESSEA="$HOME/eressea"
 fi
-ECHECK_HOME="$HOME/echeck"
 PYTHON_HOME="$ERESSEA/server/bin"
 DBTOOL_HOME="$ERESSEA/orders-php"
 GAME_HOME="$ERESSEA/game-$GAME"
@@ -38,10 +37,10 @@ checkpass() {
   return 1
 }
 
-echeck() {
+check() {
   LANGUAGE="$1"
   FILENAME="$2"
-  "$ECHECK_HOME/echeck" -w0 -x -P"$ECHECK_HOME" -R "e$GAME" -L "$LANGUAGE" "$FILENAME"
+  "echeck" -w0 -x -R "e$GAME" -L "$LANGUAGE" "$FILENAME"
 }
 
 orders() {
@@ -59,7 +58,7 @@ orders -d orders.db select | while read -r LANGUAGE EMAIL FILENAME ; do
     checkpass "$FACTION" "$PASSWORD" >> "$OUTPUT" 2>&1
   done < check.pipe
   rm -f check.pipe
-  echeck "$LANGUAGE" "$FILENAME" >> "$OUTPUT" 2>&1
+  check "$LANGUAGE" "$FILENAME" >> "$OUTPUT" 2>&1
   orders update "$FILENAME" 2
   if [ $WARNINGS -gt 0 ] ; then
     SUBJECT="$(GETTEXT 'orders received (warning)')"
