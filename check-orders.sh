@@ -32,7 +32,7 @@ checkpass() {
     fi
   fi
   # shellcheck disable=SC2059
-  printf "$(GETTEXT 'WARNING: Unknown faction %s or invalid password!')\n" "$FACTION"
+  printf "$(GETTEXT 'WARNING: Unknown faction %s or invalid password!')\\n" "$FACTION"
   WARNINGS=1
   return 1
 }
@@ -40,7 +40,7 @@ checkpass() {
 check() {
   LANGUAGE="$1"
   FILENAME="$2"
-  if ["$1"=="de"] ; then
+  if [ "$1" = "de" ] ; then
     LC_ALL=de_DE.UTF-8
   else
     LC_ALL=en_US.UTF-8
