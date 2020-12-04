@@ -40,11 +40,6 @@ checkpass() {
 check() {
   LANGUAGE="$1"
   FILENAME="$2"
-  if [ "$1" = "de" ] ; then
-    LC_ALL=de_DE.UTF-8
-  else
-    LC_ALL=en_US.UTF-8
-  fi
   "echeck" -w0 -x -R "e$GAME" -L "$LANGUAGE" "$FILENAME"
 }
 
