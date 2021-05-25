@@ -22,7 +22,7 @@ $config = [
     'password' => NULL,
 //    'password' => password_hash('eressea'),
 ];
-
+header('Content-Type: text/plain; charset=utf-8');
 $email = NULL;
 $game = filter_input(INPUT_POST, 'game', FILTER_VALIDATE_INT, ['options' => ['default' => $config['game'], 'min_range' => 1]]);
 $lang = filter_input(INPUT_POST, 'lang', FILTER_SANITIZE_STRING, ['options' => ['default' => $config['lang'], 'flags' => FILTER_REQUIRE_SCALAR]]);
@@ -46,9 +46,9 @@ $time = new DateTime();
 if (isset($_FILES['input'])) {
     $tmp_name = $_FILES['input']['tmp_name'];
     $input = file_get_contents($tmp_name);
-    $encoding = mb_detect_encoding($input, 'ASCII, UTF-8, ISO-8859-1');
-    if (!in_array($encoding, ['UTF-8', 'ASCII'])) {
-        echo "Please convert your $encoding file to UTF-8\n";
+    $encoding = mb_detect_encoding($input, ['ASCII', 'UTF-8']);
+    if (FALSE === $encoding) {
+        echo "Please convert your file to UTF-8\n";
         header('HTTP/1.0 406 Not Acceptable');
         exit();
     }
@@ -59,7 +59,8 @@ if (isset($_FILES['input'])) {
         if (move_uploaded_file($tmp_name, $filename)) {
             orders::insert($db, $time, $filename, $lang, $email, 3);
             echo "orders were received as $filename\n";
-	}
+            header('HTTP/1.0 201 Created');
+        }
         unset($db);
     }
     else {
