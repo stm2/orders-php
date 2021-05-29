@@ -13,6 +13,9 @@ class orders {
         $files = $db->getFiles();
         foreach ($files as $row) {
             $filename = $row['filename'];
+            if (!file_exists($filename)) {
+                continue;
+            }
             $content = file_get_contents($filename);
             if ($content !== FALSE) {
                 echo $content;
