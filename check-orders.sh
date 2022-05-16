@@ -52,13 +52,20 @@ cd "$ERESSEA/game-$GAME/orders.dir" || exit
 orders -d orders.db select | while read -r LANGUAGE EMAIL FILENAME ; do
   export LANGUAGE
   SUBJECT="$(GETTEXT 'orders received')"
+  found=0
   mkfifo check.pipe
   orders info "$FILENAME" > check.pipe &
   while read -r FACTION PASSWORD ; do
     checkpass "$FACTION" "$PASSWORD" >> "$OUTPUT" 2>&1
+    found=1
   done < check.pipe
   rm -f check.pipe
-  check "$LANGUAGE" "$FILENAME" >> "$OUTPUT" 2>&1
+  if [ $found -ne 0 ]; then
+    check "$LANGUAGE" "$FILENAME" >> "$OUTPUT" 2>&1
+  else
+    WARNINGS=1
+    printf "$(GETTEXT 'WARNING: Unknown faction or invalid password in %s!')\\n" "$FILENAME" >> "$OUTPUT" 
+  fi
   orders update "$FILENAME" 2
   if [ $WARNINGS -gt 0 ] ; then
     SUBJECT="$(GETTEXT 'orders received (warning)')"

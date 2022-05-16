@@ -46,7 +46,7 @@ $time = new DateTime();
 if (isset($_FILES['input'])) {
     $tmp_name = $_FILES['input']['tmp_name'];
     $input = file_get_contents($tmp_name);
-    $encoding = mb_detect_encoding($input, ['ASCII', 'UTF-8']);
+    $encoding = mb_detect_encoding($input, ['ASCII', 'UTF-8'], true);
     if (FALSE === $encoding) {
         echo "Please convert your file to UTF-8\n";
         header('HTTP/1.0 406 Not Acceptable');
