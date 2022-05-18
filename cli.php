@@ -9,7 +9,7 @@
 require_once __DIR__ . '/orders.php';
 require_once __DIR__ . '/parser.php';
 
-define('REGEXP_FACTION', '/\s*(PARTEI|ERESSEA|FACTION)\s+(\w+)\s"(\w+)"/i');
+define('REGEXP_FACTION', '/(ERESSEA|PARTEI)\s+(\w+)\s+"?([^\s"]+)"?/i');
 
 class cli {
     public static function insert(OrderDB $db, string $filename, DateTimeInterface $time, string $lang, string $email = NULL) {
