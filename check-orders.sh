@@ -40,7 +40,7 @@ checkpass() {
 check() {
   LANGUAGE="$1"
   FILENAME="$2"
-  "echeck" -w0 -x -R "e$GAME" -L "$LANGUAGE" "$FILENAME"
+  "echeck" -w1 -x -R "e$GAME" -L "$LANGUAGE" "$FILENAME"
 }
 
 orders() {

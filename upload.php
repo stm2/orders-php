@@ -13,6 +13,11 @@ if ($method != 'POST') {
 
 require_once __DIR__ . '/orders.php';
 
+$g_errno = null;
+set_error_handler(function($errno, $errstr, $errfile, int $errline) {
+    print "error $errno in $errfile:$errline, $errstr";
+    $g_errno = $errno;
+});
 // TODO: read these from a config file
 $config = [
     'game' => 2,
@@ -46,28 +51,40 @@ $time = new DateTime();
 if (isset($_FILES['input'])) {
     $tmp_name = $_FILES['input']['tmp_name'];
     $input = file_get_contents($tmp_name);
-    $encoding = mb_detect_encoding($input, ['ASCII', 'UTF-8'], true);
-    if (FALSE === $encoding) {
-        echo "Please convert your file to UTF-8\n";
-        header('HTTP/1.0 406 Not Acceptable');
-        exit();
-    }
-    $filename = tempnam($upload_dir . '/uploads', 'upload-');
-    if ($filename) {
-        $db = new OrderDB();
-        $db->connect($dbsource);
-        if (move_uploaded_file($tmp_name, $filename)) {
-            orders::insert($db, $time, $filename, $lang, $email, 3);
-            echo "orders were received as $filename\n";
-            header('HTTP/1.0 201 Created');
+}
+else {
+    $input = file_get_contents('php://input');
+}
+$encoding = mb_detect_encoding($input, ['ASCII', 'UTF-8'], true);
+if (FALSE === $encoding) {
+    echo "Please convert your file to UTF-8\n";
+    header('HTTP/1.0 406 Not Acceptable');
+    exit();
+}
+$filename = tempnam($upload_dir . '/uploads', 'upload-');
+if ($filename) {
+    $db = new OrderDB();
+    $db->connect($dbsource);
+    if (isset($tmp_name)) {
+        if (!move_uploaded_file($tmp_name, $filename)) {
+            unset($filename);
         }
-        unset($db);
     }
     else {
-        header('HTTP/1.0 507 Insufficient Storage');
+        if (FALSE == file_put_contents($filename, $input)) {
+            unset($filename);
+        }
+    }
+    if (isset($filename)) {
+        orders::insert($db, $time, $filename, $lang, $email, 3);
+        echo "orders were received as $filename\n";
+        header('HTTP/1.0 201 Created');
+    }
+    unset($db);
+    if (!empty($g_errno)) {
+        header("HTTP/1.0 400 Error $g_errno");
     }
 }
 else {
-    header('HTTP/1.0 400 Bad Request');
-    exit();
+    header('HTTP/1.0 507 Insufficient Storage');
 }
