@@ -14,6 +14,7 @@ class orders {
         foreach ($files as $row) {
             $filename = $row['filename'];
             if (!file_exists($filename)) {
+                echo ";file $filename not found\n";
                 continue;
             }
             $content = file_get_contents($filename);

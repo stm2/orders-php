@@ -20,7 +20,7 @@ class OrderDB {
 
     private function update() {
         $stmt = $this->pdo->query("PRAGMA user_version");
-        $column = $stmt->fetch(PDO::FETCH_COLUMN);
+        $column = $stmt->fetch(PDO::FETCH_NUM);
         $version = $column[0];
         if ($version >= self::SCHEMA_VERSION) {
             return;
