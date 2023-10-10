@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-16 20:49+0200\n"
+"POT-Creation-Date: 2023-10-10 18:16+0200\n"
 "PO-Revision-Date: 2019-06-09 18:11+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,18 +17,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: check-orders.sh:35
+#: check-orders.sh:70
 msgid "WARNING: Unknown faction %s or invalid password!"
 msgstr "ACHTUNG: Partei %s ist unbekannt, oder das Passwort ist falsch!"
 
-#: check-orders.sh:54
+#: check-orders.sh:88
+msgid "ECheck not installed, could not check orders %s."
+msgstr "ECheck nicht installiert, Befehle %s konnten nicht geprüft werden."
+
+#: check-orders.sh:114
 msgid "orders received"
 msgstr "Befehle angekommen"
 
-#: check-orders.sh:67
+#: check-orders.sh:133
 msgid "WARNING: Unknown faction or invalid password in %s!"
 msgstr "ACHTUNG: Unbekannte Partei oder falsches Passwort in %s!"
 
-#: check-orders.sh:71
+#: check-orders.sh:139
 msgid "orders received (warning)"
 msgstr "Befehle angekommen (Warnung)"
