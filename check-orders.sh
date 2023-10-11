@@ -45,6 +45,11 @@ ECHECK=
 if command -v echeck &> /dev/null; then
   ECHECK=echeck
   ECHECKDIR=
+else
+  if [ -x "$ERESSEA/echeck/out/echeck" ]; then
+    ECHECK=out/echeck
+    ECHECKDIR=$ERESSEA/echeck
+  fi
 fi
 
 export TEXTDOMAINDIR
@@ -76,7 +81,16 @@ check() {
   LANGUAGE="$2"
   FILENAME="$3"
   if [ -n "$ECHECK" ]; then
-    $ECHECK -w1 -x -R "$RULES" -L "$LANGUAGE" "$FILENAME" >> "$OUTPUT" 2>&1 || true
+    if [ -z "$ECHECKDIR" ]; then
+      $ECHECK -w1 -x -R "$RULES" -L "$LANGUAGE" "$FILENAME" >> "$OUTPUT" 2>&1 || true
+    else
+      ORDERSTMP=$(mktemp -t "${EMAIL}-XXXXXX")
+      cat "$FILENAME" > "$ORDERSTMP"
+      cd "$ECHECKDIR"
+      "$ECHECK" -w1 -x -R "$RULES" -L "$LANGUAGE" "$ORDERSTMP" >> "$OUTPUT" 2>&1 || true
+      rm "$ORDERSTMP"
+      cd "$OLDPWD"
+    fi
   else
     # shellcheck disable=SC2059
     printf "$(GETTEXT 'ECheck not installed, could not check orders %s.')\\n" "$FILENAME" >> "$OUTPUT"
