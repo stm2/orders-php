@@ -10,7 +10,9 @@ class parser {
     public static function parse($handle, callable $callback) {
         $order = '';
         while (($f = fgets($handle)) !== FALSE) {
-            $line = rtrim($f, "\n\r");
+            # remove BOM at start of line, this cannot hurt, right?
+            $line = preg_replace('/^\x{FEFF}/u', '', $f);
+            $line = rtrim($line, "\n\r");
             $matches = NULL;
             if (preg_match('/(.*)\\\s*$/', $line, $matches) === 1) {
                 $order .= $matches[1];
